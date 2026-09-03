@@ -660,3 +660,15 @@ input[type="number"] {
     padding: 6px 4px;
   }
 }
+
+/* ===== Разделитель для переноса кнопок на мобильных ===== */
+.mobile-break {
+  display: none;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .mobile-break {
+    display: block;
+  }
+}

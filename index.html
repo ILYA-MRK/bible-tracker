@@ -103,28 +103,29 @@
     <!-- Верхняя строка: только вкладки -->
     <div class="controls-row top-row">
       <div class="testament-tabs">
-        <div class="tab-btn active" id="tab-ALL" onclick="setTestamentFilter('ALL')">Все книги (66)</div>
         <div class="tab-btn" id="tab-OT" onclick="setTestamentFilter('OT')">Ветхий Завет (39)</div>
         <div class="tab-btn" id="tab-NT" onclick="setTestamentFilter('NT')">Новый Завет (27)</div>
       </div>
     </div>
 
-    <!-- Нижняя строка: выбор книги + все кнопки -->
-    <div class="controls-row">
-      <select id="book-select" onchange="renderGrid()"></select>
-      <button class="btn-action" onclick="markAllInBook(true)" title="Отметить все главы выбранной книги как прочитанные">Отметить книгу</button>
-      <button class="btn-action" onclick="markAllInBook(false)" title="Снять отметки со всех глав выбранной книги">Снять отметки</button>
-      <details class="dropdown-menu">
-        <summary class="dropdown-summary" title="Дополнительные действия: инструкция, бэкап, загрузка">⚙️ Дополнительно</summary>
-        <div class="dropdown-content">
-          <button class="btn-help" onclick="openHelp()" title="Открыть краткую инструкцию по использованию приложения">📖 Инструкция</button>
-          <button class="btn-backup" onclick="exportBackup()" title="Скачать JSON-файл с вашим прогрессом и настройками">📥 Бэкап</button>
-          <button class="btn-backup" onclick="document.getElementById('import-file').click()" title="Восстановить прогресс из ранее сохранённого JSON-файла">📤 Загрузить</button>
-        </div>
-      </details>
-      <button class="btn-sync" onclick="toggleSyncPanel()" title="Настроить синхронизацию через GitHub Gist (облако)">☁️ Облачная синхронизация</button>
-      <button class="btn-danger" onclick="resetProgress()" title="Полностью очистить весь прогресс чтения (действие необратимо)">🗑️ Сброс</button>
+<!-- Нижняя строка: выбор книги + все кнопки -->
+<div class="controls-row">
+  <select id="book-select" onchange="renderGrid()"></select>
+  <button class="btn-action" onclick="markAllInBook(true)" title="Отметить все главы выбранной книги как прочитанные">Отметить книгу</button>
+  <button class="btn-action" onclick="markAllInBook(false)" title="Снять отметки со всех глав выбранной книги">Снять отметки</button>
+  <details class="dropdown-menu">
+    <summary class="dropdown-summary" title="Дополнительные действия: инструкция, бэкап, загрузка">⚙️ Дополнительно</summary>
+    <div class="dropdown-content">
+      <button class="btn-help" onclick="openHelp()" title="Открыть краткую инструкцию по использованию приложения">📖 Инструкция</button>
+      <button class="btn-backup" onclick="exportBackup()" title="Скачать JSON-файл с вашим прогрессом и настройками">📥 Бэкап</button>
+      <button class="btn-backup" onclick="document.getElementById('import-file').click()" title="Восстановить прогресс из ранее сохранённого JSON-файла">📤 Загрузить</button>
     </div>
+  </details>
+  <!-- РАЗДЕЛИТЕЛЬ ДЛЯ МОБИЛЬНЫХ (невидим на ПК) -->
+  <span class="mobile-break"></span>
+  <button class="btn-sync" onclick="toggleSyncPanel()" title="Настроить синхронизацию через GitHub Gist (облако)">☁️ Облачная синхронизация</button>
+  <button class="btn-danger" onclick="resetProgress()" title="Полностью очистить весь прогресс чтения (действие необратимо)">🗑️ Сброс</button>
+</div>
     <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importBackup(event)">
   </div>
 

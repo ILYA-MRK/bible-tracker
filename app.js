@@ -48,7 +48,7 @@ function init() {
   loadProgress();
   buildPeriods();
   initPeriodSelector();
-  setTestamentFilter('ALL');
+  setTestamentFilter('OT');
   updateStats();
   initSyncForm();
   registerServiceWorker();
@@ -838,6 +838,10 @@ function openHelp() {
   if (modal) {
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    console.log('✅ Модальное окно открыто');
+  } else {
+    console.error('❌ Элемент #help-modal не найден!');
+    alert('Не удалось открыть инструкцию. Попробуйте обновить страницу.');
   }
 }
 
