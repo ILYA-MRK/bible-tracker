@@ -51,7 +51,7 @@
     <!-- Баннер уведомления -->
     <div id="period-alert" style="display: none; margin-top: 8px; padding: 8px 12px; background-color: #fbbf24; color: #0f172a; border-radius: 6px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
       <span id="alert-text">⏳ До окончания периода осталось 3 дня!</span>
-      <span id="alert-close" style="cursor: pointer; font-size: 1.2rem; line-height: 1;">&times;</span>
+      <span onclick="closeAlert()" style="cursor: pointer; font-size: 1.2rem; line-height: 1;">&times;</span>
     </div>
     <div class="controls-row" style="margin-top: 12px; margin-bottom: 12px;">
       <select id="period-select" onchange="updatePeriodInfo()"></select>
