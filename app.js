@@ -2,7 +2,6 @@
 //  СПИСОК КНИГ БИБЛИИ (66 книг)
 // ============================================================
 const BOOKS = [
-  // Ветхий Завет (OT)
   {name: "Бытие", chapters: 50, t: "OT"}, {name: "Исход", chapters: 40, t: "OT"}, {name: "Левит", chapters: 27, t: "OT"},
   {name: "Числа", chapters: 36, t: "OT"}, {name: "Второзаконие", chapters: 34, t: "OT"}, {name: "Иисус Навин", chapters: 24, t: "OT"},
   {name: "Судьи", chapters: 21, t: "OT"}, {name: "Руфь", chapters: 4, t: "OT"}, {name: "1 Царств", chapters: 31, t: "OT"},
@@ -16,7 +15,6 @@ const BOOKS = [
   {name: "Авдий", chapters: 1, t: "OT"}, {name: "Иона", chapters: 4, t: "OT"}, {name: "Михей", chapters: 7, t: "OT"},
   {name: "Наум", chapters: 3, t: "OT"}, {name: "Аввакум", chapters: 3, t: "OT"}, {name: "Софония", chapters: 3, t: "OT"},
   {name: "Аггей", chapters: 2, t: "OT"}, {name: "Захария", chapters: 14, t: "OT"}, {name: "Малахия", chapters: 4, t: "OT"},
-  // Новый Завет (NT)
   {name: "От Матфея", chapters: 28, t: "NT"}, {name: "От Марка", chapters: 16, t: "NT"}, {name: "От Луки", chapters: 24, t: "NT"},
   {name: "От Иоанна", chapters: 21, t: "NT"}, {name: "Деяния", chapters: 28, t: "NT"}, {name: "Иакова", chapters: 5, t: "NT"},
   {name: "1 Петра", chapters: 5, t: "NT"}, {name: "2 Петра", chapters: 3, t: "NT"}, {name: "1 Иоанна", chapters: 5, t: "NT"},
@@ -28,9 +26,6 @@ const BOOKS = [
   {name: "Филимону", chapters: 1, t: "NT"}, {name: "Евреям", chapters: 13, t: "NT"}, {name: "Откровение", chapters: 22, t: "NT"}
 ];
 
-// ============================================================
-//  СОСТОЯНИЕ ПРИЛОЖЕНИЯ
-// ============================================================
 let currentFilter = 'ALL';
 let progress = {};
 let startDate = null;
@@ -40,7 +35,7 @@ let PERIODS = [];
 let syncDebounceTimer = null;
 const DEBOUNCE_DELAY = 3000;
 
-let chartVisible = false; // график скрыт по умолчанию
+let chartVisible = false;
 let chartCanvas = null;
 let chartCtx = null;
 
@@ -59,7 +54,6 @@ function init() {
   registerServiceWorker();
   initChart();
 
-  // Устанавливаем начальное состояние графика (скрыт)
   const container = document.getElementById('chart-container');
   if (container) container.style.display = 'none';
   const toggle = document.getElementById('chart-toggle');
@@ -310,7 +304,6 @@ function renderPeriodTable() {
     tbody.appendChild(tr);
   });
 }
-
 
 // ============================================================
 //  ФИЛЬТРЫ И СЕЛЕКТЫ
@@ -868,12 +861,31 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================================
-//  УВЕДОМЛЕНИЕ О СКОРОМ ОКОНЧАНИИ ПЕРИОДА (БАННЕР)
+//  БАННЕР УВЕДОМЛЕНИЯ (с сохранением даты закрытия)
 // ============================================================
+function closeAlert() {
+  const alertEl = document.getElementById('period-alert');
+  if (alertEl) {
+    alertEl.classList.remove('visible');
+    alertEl.style.display = 'none';
+    // Запоминаем, что сегодня баннер закрыт
+    localStorage.setItem('bible_banner_closed_date', new Date().toDateString());
+  }
+}
+
 function updatePeriodAlert() {
   const alertEl = document.getElementById('period-alert');
   const alertText = document.getElementById('alert-text');
   if (!alertEl || !alertText) return;
+
+  // Если сегодня баннер уже закрывали – не показываем
+  const closedDate = localStorage.getItem('bible_banner_closed_date');
+  const today = new Date().toDateString();
+  if (closedDate === today) {
+    alertEl.classList.remove('visible');
+    alertEl.style.display = 'none';
+    return;
+  }
 
   const periodId = parseInt(document.getElementById('period-select').value) || 1;
   const period = PERIODS.find(p => p.id === periodId);
@@ -882,15 +894,13 @@ function updatePeriodAlert() {
     return;
   }
 
-  const today = new Date();
-  today.setHours(0,0,0,0);
+  const todayDate = new Date();
+  todayDate.setHours(0,0,0,0);
   const endDate = new Date(period.endDate);
   endDate.setHours(0,0,0,0);
 
-  const diffTime = endDate - today;
+  const diffTime = endDate - todayDate;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  // Закомментированный блок удалён – уведомления отправляет сервер
 
   if (diffDays > 5 || diffDays < 0) {
     alertEl.classList.remove('visible');
@@ -920,7 +930,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================================
-//  ЭКСПОРТ ОТЧЁТА ЗА ПЕРИОД
+//  ЭКСПОРТ ОТЧЁТА (с BOM для корректной кодировки)
 // ============================================================
 function downloadPeriodReport() {
   const periodId = parseInt(document.getElementById('period-select').value) || 1;
@@ -985,7 +995,8 @@ function downloadPeriodReport() {
 
   const reportText = lines.join('\n');
 
-  const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
+  // Добавляем BOM (U+FEFF) для правильной кодировки в Windows
+  const blob = new Blob(['\uFEFF' + reportText], { type: 'text/plain;charset=utf-8' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
   link.download = `Отчёт_период_${period.id}_${new Date().toISOString().slice(0,10)}.txt`;
@@ -994,16 +1005,7 @@ function downloadPeriodReport() {
   document.body.removeChild(link);
   URL.revokeObjectURL(link.href);
 }
-// ============================================================
-//  ЗАКРЫТИЕ БАННЕРА УВЕДОМЛЕНИЯ
-// ============================================================
-function closeAlert() {
-  const alertEl = document.getElementById('period-alert');
-  if (alertEl) {
-    alertEl.classList.remove('visible');
-    alertEl.style.display = 'none'; // дополнительно скрываем, если класс не сработал
-  }
-}
+
 // ============================================================
 //  ЗАПУСК
 // ============================================================

@@ -625,3 +625,38 @@ input[type="number"] {
     font-size: 1.1rem;
   }
 }
+
+/* ===== Таблица периодов ===== */
+.period-table-container table th,
+.period-table-container table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.period-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem; /* базовый размер */
+}
+
+.period-table-container th {
+  background-color: var(--border-color);
+  color: var(--text-main);
+  font-weight: 600;
+  padding: 10px 8px;
+}
+
+.period-table-container td {
+  padding: 8px 6px;
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 600px) {
+  .period-table-container table {
+    font-size: 0.85rem;
+  }
+  .period-table-container th,
+  .period-table-container td {
+    padding: 6px 4px;
+  }
+}
