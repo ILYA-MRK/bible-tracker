@@ -1,0 +1,627 @@
+:root {
+  --bg-color: #0f172a;
+  --card-bg: #1e293b;
+  --accent-color: #22c55e;        /* теперь зелёный */
+  --accent-hover: #16a34a;        /* тёмно-зелёный при наведении */
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+  --success-color: #22c55e;
+  --danger-color: #ef4444;
+  --max-width: 1200px;
+}
+
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+h1 {
+  font-size: 1.6rem;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* ===== Карточки ===== */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* ===== Статистика ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.stat-val {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 12px;
+  background-color: var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background-color: var(--accent-color);
+  transition: width 0.3s ease;
+}
+
+/* ===== Периоды ===== */
+.period-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.status-badge {
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.badge-success {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+.badge-danger {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.toggle-link {
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  cursor: pointer;
+}
+
+.period-table-container {
+  margin-top: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+th, td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* ===== Управление ===== */
+.controls-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.controls-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Строка с вкладками и кнопкой "Дополнительно" */
+.controls-row.top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.testament-tabs {
+  flex: 1 1 auto;
+  display: flex;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.tab-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-radius: 6px;
+  color: var(--text-muted);
+  transition: background 0.2s;
+}
+
+.tab-btn.active {
+  background-color: var(--accent-color);
+  color: white;
+  font-weight: bold;
+}
+
+/* ===== Выпадающее меню "Дополнительно" ===== */
+.dropdown-menu {
+  display: inline-block;
+  position: relative;
+  margin-left: auto; /* прижимаем вправо */
+}
+
+.dropdown-summary {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: var(--border-color);
+  color: var(--text-main);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  user-select: none;
+  list-style: none;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.dropdown-summary:hover {
+  background-color: #475569;
+}
+
+.dropdown-menu summary::-webkit-details-marker {
+  display: none;
+}
+.dropdown-menu summary {
+  list-style: none;
+}
+
+.dropdown-content {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0; /* выпадает вправо, чтобы не вылезать за левый край */
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+  z-index: 100;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.dropdown-content button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-main);
+  font-weight: 500;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.dropdown-content button:hover {
+  background-color: var(--border-color);
+}
+.dropdown-content .btn-danger:hover {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+/* ===== Кнопки ===== */
+button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+button:hover {
+  opacity: 0.9;
+}
+
+.btn-action {
+  background-color: var(--border-color);
+  color: var(--text-main);
+}
+.btn-backup,
+.btn-help {
+  background-color: #475569;
+  color: var(--text-main);
+}
+.btn-sync {
+  background-color: var(--accent-color);
+  color: white;
+}
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+/* ===== Формы ===== */
+select,
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="number"] {
+  width: 100%;
+  padding: 10px 14px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.sync-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+.sync-status-text {
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+#sync-spinner {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* ===== Сетка глав ===== */
+.book-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.chapters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 10px;
+}
+
+.chapter-btn {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0f172a;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.15s, transform 0.1s;
+}
+.chapter-btn:hover {
+  transform: scale(1.05);
+}
+.chapter-btn.read {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+/* ===== График ===== */
+#chart-container {
+  width: 100%;
+  margin-top: 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 10px 0;
+  transition: opacity 0.2s;
+}
+
+#progress-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 400px;
+  background-color: var(--card-bg);
+}
+
+#chart-toggle {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-color);
+  cursor: pointer;
+}
+
+/* ===== Подсказки (title) ===== */
+[title] {
+  position: relative;
+  cursor: help;
+}
+
+/* ===== Баннер уведомления ===== */
+#period-alert {
+  background-color: #fbbf24 !important;
+  color: #0f172a !important;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 8px;
+  display: none;
+  font-weight: bold;
+  align-items: center;
+  justify-content: space-between;
+}
+#period-alert.visible {
+  display: flex !important;
+}
+#alert-close {
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+/* ===== Модальное окно инструкции ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  animation: slideUp 0.2s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.modal-close {
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s;
+  line-height: 1;
+}
+.modal-close:hover {
+  color: var(--text-main);
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+.modal-body h3 {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  color: var(--accent-color);
+}
+.modal-body h3:first-of-type {
+  margin-top: 0;
+}
+.modal-body ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0 0 12px 0;
+}
+.modal-body li {
+  padding: 6px 0 6px 24px;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2322c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>') left center no-repeat;
+  background-size: 16px;
+  line-height: 1.5;
+  color: var(--text-main);
+}
+
+.modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+}
+.modal-footer button {
+  padding: 8px 24px;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ===== Адаптивность ===== */
+
+/* Мобильные устройства */
+@media (max-width: 600px) {
+  :root {
+    --max-width: 100%;
+  }
+  .container {
+    padding: 0 4px;
+  }
+  .card {
+    padding: 14px;
+  }
+  .stats-grid {
+    gap: 6px;
+  }
+  .stat-val {
+    font-size: 1rem;
+  }
+  .controls-row {
+    gap: 6px;
+  }
+  button {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  .chapters-grid {
+    grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+    gap: 6px;
+  }
+  .chapter-btn {
+    font-size: 0.85rem;
+  }
+  .tab-btn {
+    font-size: 0.7rem;
+    padding: 8px 4px;
+  }
+  h1 {
+    font-size: 1.2rem;
+  }
+  .period-table-container {
+    max-height: 200px;
+  }
+  table {
+    font-size: 0.7rem;
+  }
+  th,
+  td {
+    padding: 6px 4px;
+  }
+  #chart-container {
+    padding: 5px 0;
+  }
+  #progress-chart {
+    min-height: 300px;
+  }
+
+  /* Выпадающее меню на мобильных — без абсолютного позиционирования */
+  .dropdown-content {
+    position: static;
+    box-shadow: none;
+    border: none;
+    padding: 4px 0;
+    min-width: auto;
+  }
+  .dropdown-content button {
+    padding: 10px 12px;
+  }
+  .dropdown-summary {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+
+  /* Модалка */
+  .modal-content {
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 12px;
+  }
+  .modal-header h2 {
+    font-size: 1.1rem;
+  }
+  .modal-body {
+    padding: 14px;
+    font-size: 0.9rem;
+  }
+  .modal-body li {
+    padding: 4px 0 4px 20px;
+    background-size: 14px;
+  }
+}
+
+/* Большие экраны (≥1400px) */
+@media (min-width: 1400px) {
+  :root {
+    --max-width: 1400px;
+  }
+  .chapters-grid {
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    gap: 12px;
+  }
+  .chapter-btn {
+    font-size: 1.1rem;
+  }
+}

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg3" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0b0f19"/>
+    </radialGradient>
+    <linearGradient id="green-3d" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#86efac"/>
+      <stop offset="50%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#14532d"/>
+    </linearGradient>
+    <filter id="soft-depth">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="110" fill="url(#bg3)"/>
+
+  <!-- Кольцо с глубоким 3D градиентом -->
+  <circle cx="256" cy="256" r="165" fill="none" stroke="#111827" stroke-width="26"/>
+  <circle cx="256" cy="256" r="165" fill="none" stroke="url(#green-3d)" stroke-width="26"
+          stroke-dasharray="1036" stroke-dashoffset="230" stroke-linecap="round"
+          transform="rotate(-90 256 256)" filter="url(#soft-depth)"/>
+
+  <!-- Книга с маркером -->
+  <g filter="url(#soft-depth)">
+    <path d="M160 205 C210 190, 242 205, 256 215 C270 205, 302 190, 352 205 V325 C302 310, 270 325, 256 335 C242 325, 210 310, 160 325 Z" fill="#f1f5f9"/>
+    <path d="M256 215 V335" stroke="#94a3b8" stroke-width="4"/>
+    <circle cx="256" cy="275" r="10" fill="#22c55e"/>
+  </g>
+</svg>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Трекер чтения Библии</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <link rel="apple-touch-icon" href="ikonka_android.svg">
+  <link rel="icon" type="image/svg+xml" href="ikonka_web.svg">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>📖 Трекер чтения Библии</h1>
+
+  <!-- Общий прогресс -->
+  <div class="card">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-label">Прочитано всего</div>
+        <div class="stat-val" id="stat-chapters">0 / 1189</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Общий прогресс</div>
+        <div class="stat-val" id="stat-percent">0%</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Осталось глав</div>
+        <div class="stat-val" id="stat-remaining">1189</div>
+      </div>
+    </div>
+    <div class="stat-label" style="margin-top: 10px;">Общая шкала выполнения:</div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Отчет за периоды -->
+  <div class="card">
+    <div class="period-header">
+      <h3 style="margin: 0;">📊 Прогресс по периодам</h3>
+      <span id="period-badge" class="status-badge badge-success">В графике</span>
+    </div>
+    <!-- Баннер уведомления -->
+    <div id="period-alert" style="display: none; margin-top: 8px; padding: 8px 12px; background-color: #fbbf24; color: #0f172a; border-radius: 6px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+      <span id="alert-text">⏳ До окончания периода осталось 3 дня!</span>
+      <span id="alert-close" style="cursor: pointer; font-size: 1.2rem; line-height: 1;">&times;</span>
+    </div>
+    <div class="controls-row" style="margin-top: 12px; margin-bottom: 12px;">
+      <select id="period-select" onchange="updatePeriodInfo()"></select>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-label">Цель на конец периода</div>
+        <div class="stat-val" id="period-target-val">0 глав</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Фактически прочитано</div>
+        <div class="stat-val" id="period-actual-val">0 глав</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Отклонение</div>
+        <div class="stat-val" id="period-diff-val">0</div>
+      </div>
+    </div>
+    <div style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <button class="btn-backup" onclick="downloadPeriodReport()" title="Скачать текстовый отчёт по текущему периоду">📄 Скачать отчёт</button>
+    </div>
+    <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+      <span class="toggle-link" onclick="togglePeriodTable()" id="toggle-table-btn">Показать все периоды ▲</span>
+      <label style="font-size: 0.85rem; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px;">
+        <input type="checkbox" id="chart-toggle" onchange="toggleChartVisibility()"> 
+        Показать график прогресса
+      </label>
+    </div>
+    <div class="period-table-container" id="period-table-wrapper" style="display: none;">
+      <table>
+        <thead>
+          <tr>
+            <th>Период</th>
+            <th>Даты</th>
+            <th>Цель (глав)</th>
+            <th>Факт (к концу)</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody id="period-table-body"></tbody>
+      </table>
+    </div>
+    <!-- Контейнер графика -->
+    <div id="chart-container" style="margin-top: 20px; width: 100%; display: none;">
+      <canvas id="progress-chart" width="600" height="300"></canvas>
+      <div id="chart-placeholder" style="display: none; text-align: center; padding: 20px; color: var(--text-muted);">
+        Включите отображение графика, чтобы увидеть визуализацию прогресса.
+      </div>
+    </div>
+  </div>
+
+  <!-- Панель управления и фильтры -->
+  <div class="controls-group">
+    <div class="controls-row top-row">
+      <div class="testament-tabs">
+        <div class="tab-btn active" id="tab-ALL" onclick="setTestamentFilter('ALL')">Все книги (66)</div>
+        <div class="tab-btn" id="tab-OT" onclick="setTestamentFilter('OT')">Ветхий Завет (39)</div>
+        <div class="tab-btn" id="tab-NT" onclick="setTestamentFilter('NT')">Новый Завет (27)</div>
+      </div>
+      <details class="dropdown-menu" style="margin-left: auto;">
+        <summary class="dropdown-summary" title="Дополнительные действия: инструкция, бэкап, загрузка">⚙️ Дополнительно</summary>
+        <div class="dropdown-content">
+          <button class="btn-help" onclick="openHelp()" title="Открыть краткую инструкцию по использованию приложения">📖 Инструкция</button>
+          <button class="btn-backup" onclick="exportBackup()" title="Скачать JSON-файл с вашим прогрессом и настройками">📥 Бэкап</button>
+          <button class="btn-backup" onclick="document.getElementById('import-file').click()" title="Восстановить прогресс из ранее сохранённого JSON-файла">📤 Загрузить</button>
+        </div>
+      </details>
+    </div>
+
+    <div class="controls-row">
+      <select id="book-select" onchange="renderGrid()"></select>
+      <button class="btn-action" onclick="markAllInBook(true)" title="Отметить все главы выбранной книги как прочитанные">Отметить книгу</button>
+      <button class="btn-action" onclick="markAllInBook(false)" title="Снять отметки со всех глав выбранной книги">Снять отметки</button>
+      <button class="btn-sync" onclick="toggleSyncPanel()" title="Настроить синхронизацию через GitHub Gist (облако)">☁️ Облачная синхронизация</button>
+      <button class="btn-danger" onclick="resetProgress()" title="Полностью очистить весь прогресс чтения (действие необратимо)">🗑️ Сброс</button>
+    </div>
+    <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importBackup(event)">
+  </div>
+
+  <!-- Настройки синхронизации + выбор плана -->
+  <div class="card" id="sync-panel" style="display: none;">
+    <h3 style="margin-top:0;">☁️ Настройки синхронизации</h3>
+    <p style="font-size: 0.85rem; color: var(--text-muted);">
+      Вставьте данные GitHub для синхронизации ПК и телефона.
+    </p>
+    <div class="sync-form">
+      <input type="password" id="gh-token" placeholder="GitHub Personal Access Token (ghp_...)" autocomplete="off">
+      <input type="text" id="gh-gist-id" placeholder="Gist ID (32 символа)">
+      
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <label style="font-size: 0.85rem; color: var(--text-muted);">Дата старта плана:</label>
+        <input type="date" id="start-date-input" style="flex:1; min-width:150px;">
+      </div>
+
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <label style="font-size: 0.85rem; color: var(--text-muted);">Количество дней для чтения:</label>
+        <input type="number" id="total-days-input" min="1" max="2000" value="280" style="width:100px;">
+        <button class="btn-action" onclick="applyPlanSettings()">Применить</button>
+      </div>
+
+      <div class="controls-row">
+        <button class="btn-sync" onclick="saveSyncSettings()">Сохранить и Синхронизировать</button>
+        <button class="btn-action" onclick="pullFromCloud()">Загрузить из облака</button>
+      </div>
+      <div id="sync-status" class="sync-status-text"></div>
+      <div id="sync-spinner" style="display:none; text-align:center; margin-top:5px;">⏳ Загрузка...</div>
+      <p style="font-size:0.7rem; color:var(--text-muted); margin-top:8px;">
+        ⚠️ Токен хранится в локальном хранилище браузера. Используйте токен с правами только на gist.
+      </p>
+    </div>
+  </div>
+
+  <!-- Сетка глав -->
+  <div class="card">
+    <div class="book-header">
+      <h2 id="book-title" style="margin:0; font-size: 1.2rem;"></h2>
+      <span id="book-status" style="color: var(--text-muted); font-size: 0.9rem;"></span>
+    </div>
+    <div class="chapters-grid" id="chapters-grid"></div>
+  </div>
+</div>
+
+<!-- Модальное окно инструкции -->
+<div id="help-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>📖 Как пользоваться трекером</h2>
+      <span class="modal-close" onclick="closeHelp()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <h3>📚 Основные возможности</h3>
+      <ul>
+        <li><strong>Отметка глав:</strong> нажмите на номер главы в сетке, чтобы отметить её как прочитанную (дата прочтения сохранится автоматически).</li>
+        <li><strong>Фильтрация книг:</strong> переключайтесь между «Все книги», «Ветхий Завет» и «Новый Завет».</li>
+        <li><strong>Выбор книги:</strong> в выпадающем списке виден прогресс по каждой книге (прочитано / всего).</li>
+        <li><strong>Групповые действия:</strong> кнопки «Отметить книгу» и «Снять отметки» применяются ко всей выбранной книге.</li>
+      </ul>
+
+      <h3>📊 Прогресс и периоды</h3>
+      <ul>
+        <li><strong>Общий прогресс:</strong> показывает количество прочитанных глав, процент и остаток.</li>
+        <li><strong>Периоды по 10 дней:</strong> выберите любой период в выпадающем списке, чтобы увидеть цель, фактически прочитанное и отклонение.</li>
+        <li><strong>Таблица всех периодов:</strong> показывает динамику выполнения плана за каждый период (реальные данные).</li>
+        <li><strong>График прогресса:</strong> включите его через чекбокс, чтобы визуально сравнить цель и факт по каждому периоду (столбцы автоматически масштабируются).</li>
+        <li><strong>Скачать отчёт:</strong> кнопка «📄 Скачать отчёт» создаёт текстовый файл со статистикой за выбранный период: сколько прочитано, остаток по Ветхому и Новому Завету, общий прогресс.</li>
+      </ul>
+
+      <h3>⚙️ Настройки плана</h3>
+      <ul>
+        <li><strong>Дата старта:</strong> укажите день, с которого начинаете чтение – все периоды пересчитаются.</li>
+        <li><strong>Количество дней:</strong> можно выбрать любой план (280, 365, 90 и т.д.) – цели по периодам перестроятся автоматически.</li>
+      </ul>
+
+      <h3>☁️ Синхронизация и резервирование</h3>
+      <ul>
+        <li><strong>Облачная синхронизация</strong> через GitHub Gist – настройте один раз, и данные будут общими для всех ваших устройств.</li>
+        <li><strong>Бэкап</strong> – скачивает JSON-файл со всеми данными (прогресс + настройки).</li>
+        <li><strong>Загрузить</strong> – восстанавливает данные из ранее сохранённого бэкапа.</li>
+        <li><strong>Сброс</strong> – полностью очищает прогресс (действие необратимо, будьте осторожны).</li>
+      </ul>
+
+      <h3>🔔 Push-уведомления (на телефон)</h3>
+      <ul>
+        <li><strong>Автоматические напоминания:</strong> если вы разрешили уведомления в браузере, на телефон будут приходить напоминания за 5, 3 и 1 день до окончания текущего периода – даже если приложение закрыто.</li>
+        <li><strong>Как подписаться:</strong> при первом открытии приложения браузер спросит разрешение – разрешите. Если не спросил, проверьте настройки уведомлений в браузере.</li>
+        <li><strong>Работает на Android и iOS (Safari 16.4+):</strong> уведомления доставляются через сервер OneSignal, который работает 24/7 на бесплатном хостинге.</li>
+        <li><strong>Внутренний баннер:</strong> даже без push-уведомлений вы увидите жёлтый баннер внутри приложения за 5, 3 и 1 день до окончания периода.</li>
+      </ul>
+
+      <p style="margin-top: 16px; color: var(--text-muted); font-size: 0.9rem;">
+        💡 Все данные сохраняются в вашем браузере (localStorage) и синхронизируются с облаком (при настройке Gist). Сервер уведомлений использует те же настройки, что и вы, поэтому напоминания всегда актуальны.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-action" onclick="closeHelp()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- OneSignal SDK -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "2c0431da-262a-4140-b70f-4f1f4560445c",
+      serviceWorkerOverrideForTypical: true,
+      path: "",
+      serviceWorkerParam: { scope: "/bible-tracker/" },
+      serviceWorkerPath: "/bible-tracker/OneSignalSDKWorker.js",
+    });
+    // Показываем приглашение подписаться на уведомления
+    OneSignal.showSlidedownPrompt();
+  });
+</script>
+
+<script src="app.js"></script>
+</body>
+</html>
